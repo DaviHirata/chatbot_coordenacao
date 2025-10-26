@@ -1,0 +1,52 @@
+version: '3.8'
+
+services:
+  frontend:
+    build: ./frontend-react
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend-java
+    networks:
+      - ada_network
+
+  backend-java:
+    build: ./backend-java
+
+    env_file:
+      - ./backend-java/.env
+    ports:
+      - "8080:8080"
+    depends_on:
+      - backend-python
+    networks:
+      - ada_network
+
+  backend-python:
+    build: ./backend-python
+    ports:
+      - "8001:8000" # Mapeando para 8001 para evitar conflito com o ChromaDB
+    volumes:
+      - chroma_data:/app/chroma_db # Volume para persistir os dados do ChromaDB
+    env_file:
+      - ./backend-python/.env
+    depends_on:
+      - chroma-db
+    networks:
+      - ada_network
+
+  chroma-db:
+    image: chromadb/chroma
+    ports:
+      - "8000:8000"
+    volumes:
+      - chroma_data:/chroma/.chroma/
+    networks:
+      - ada_network
+
+volumes:
+  chroma_data:
+
+networks:
+  ada_network:
+    driver: bridge
