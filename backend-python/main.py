@@ -53,10 +53,9 @@ prompt = ChatPromptTemplate.from_template("""
 
 retriever = vectorStore.as_retriever(search_kwargs={"k": 4})
 
-# Pipeline corrigido
 rag_chain = (
     {
-        "context": retriever | format_docs,  # Adiciona format_docs aqui
+        "context": retriever | format_docs,
         "question": RunnablePassthrough()
     }
     | prompt
@@ -70,15 +69,11 @@ def read_root():
 
 @app.post("/ask")
 async def ask_question(prompt: str):
-    # Agora passa a string diretamente
     response = rag_chain.invoke(prompt)
     return {"answer": response}
 
 @app.post("/upload")
-async def upload_pdf(file: UploadFile):
-    #if authorization != f"Bearer {os.getenv('UPLOAD_TOKEN')}":
-    #    raise HTTPException(status_code=403, detail="Acesso não autorizado")
-    
+async def upload_pdf(file: UploadFile):    
     with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
         tmp.write(await file.read())
         tmp_path = tmp.name
@@ -93,7 +88,6 @@ async def upload_pdf(file: UploadFile):
     chunks = text_splitter.split_documents(docs)
     
     vectorStore.add_documents(chunks)
-    #vectorStore.persist()
     
     # Limpar arquivo temporário
     os.unlink(tmp_path)
