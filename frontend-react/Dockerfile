@@ -8,6 +8,8 @@ COPY package.json ./
 
 RUN npm install
 
+RUN npm install lucide-react
+
 COPY . ./
 
 RUN npm run build

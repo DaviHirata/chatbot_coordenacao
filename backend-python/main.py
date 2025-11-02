@@ -11,6 +11,8 @@ from langchain_groq import ChatGroq
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import RunnablePassthrough
+from langchain_core.documents import Document
+import re
 
 load_dotenv()
 app = FastAPI()
@@ -18,7 +20,7 @@ app = FastAPI()
 # Carregar ou criar o banco vetorial
 persist_dir = "./chroma_db"
 embedding = HuggingFaceEndpointEmbeddings(
-    model="sentence-transformers/all-mpnet-base-v2",
+    model="sentence-transformers/multi-qa-mpnet-base-dot-v1",
     task="feature-extraction",
     huggingfacehub_api_token=os.getenv('HUGGINGFACE_API_KEY')
 )
@@ -42,8 +44,10 @@ def format_docs(docs):
 
 # Criar o pipeline RAG
 prompt = ChatPromptTemplate.from_template("""
-    Use o contexto a seguir para responder com precisão e clareza.
-    Se a resposta não estiver no contexto, diga "Não encontrei informações suficientes no contexto".
+    Você é **Ada**, assistente virtual do curso de **Tecnologia em Sistemas para Internet da UFSM**.
+    Responda apenas com base no contexto fornecido.  
+    Se não houver informação suficiente, diga:  
+    "Não encontrei informações suficientes no contexto."
 
     Contexto:
     {context}
@@ -80,10 +84,28 @@ async def upload_pdf(file: UploadFile):
     
     loader = PyPDFLoader(tmp_path)
     docs = loader.load()
+    content = " ".join(doc.page_content for doc in docs)
+
+    # Pré-processamento dos documentos
+    if re.search(r"(\d+°\s*Semestre)", content):
+        # Juntar cada bloco de semestre
+        blocos = re.split(r"(\d+°\s*Semestre)", content)
+        semestres = []
+        for i in range(1, len(blocos), 2):
+            titulo = blocos[i].strip()
+            texto = blocos[i + 1].strip()
+            semestres.append({
+                "semestre": titulo,
+                "conteudo": f"{titulo}\n{texto}"
+            })
+        docs = [Document(page_content=s["conteudo"], metadata={"semestre": s["semestre"]}) for s in semestres]
+    else:
+        for doc in docs:
+            doc.page_content = doc.page_content.replace('\n', ' ').strip()
     
     text_splitter = RecursiveCharacterTextSplitter(
-        chunk_size=1000, 
-        chunk_overlap=100
+        chunk_size=800, 
+        chunk_overlap=200
     )
     chunks = text_splitter.split_documents(docs)
     
