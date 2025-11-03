@@ -1,11 +1,10 @@
 import os
 import tempfile
 from dotenv import load_dotenv
-from fastapi import FastAPI, UploadFile, Header, HTTPException
+from fastapi import FastAPI, UploadFile
 from langchain_community.document_loaders import PyPDFLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_huggingface import HuggingFaceEndpointEmbeddings
-from chromadb.config import Settings
 from langchain_chroma import Chroma
 from langchain_groq import ChatGroq
 from langchain_core.prompts import ChatPromptTemplate
