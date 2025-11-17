@@ -12,7 +12,7 @@ COPY src ./src
 RUN mvn clean install -DskipTests
 
 # Estágio 2: Execução da aplicação
-FROM openjdk:21-jdk-slim
+FROM eclipse-temurin:21-jdk-alpine
 
 WORKDIR /app
 

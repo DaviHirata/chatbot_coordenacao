@@ -23,7 +23,8 @@ services:
   backend-python:
     build: ./backend-python
     ports:
-      - "8001:8000" # Mapeando para 8001 para evitar conflito com o ChromaDB
+      - "8001:8001" # Mapeando para 8001 para evitar conflito com o ChromaDB
+    command: ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8001"]
     volumes:
       - chroma_data:/app/chroma_db # Volume para persistir os dados do ChromaDB
     env_file:

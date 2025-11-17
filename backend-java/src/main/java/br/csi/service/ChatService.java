@@ -22,10 +22,10 @@ import java.util.Map;
 public class ChatService {
     private final RestTemplate restTemplate;
 
-    @Value("http://backend-python:8000/ask")
+    @Value("${rag.api.url}")
     private String RAG_API_URL;
 
-    @Value("http://backend-python:8000/upload")
+    @Value("${rag.api.upload.url}")
     private String RAG_API_UPLOAD_URL;
 
     public ChatService(RestTemplate restTemplate) {
@@ -46,7 +46,7 @@ public class ChatService {
 
             // Faz a chamada HTTP
             ResponseEntity<Map> response = restTemplate.exchange(
-                    RAG_API_URL + "?prompt=" + URLEncoder.encode(question, StandardCharsets.UTF_8),
+                    RAG_API_URL,
                     HttpMethod.POST,
                     request,
                     Map.class
