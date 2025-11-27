@@ -1,6 +1,6 @@
-Para rodar o projeto, primeiro é necessário criar:
-    1) Token JWT para segurança do endpoint de Update (`.env` do diretório `backend-java`)
-    2) Chaves das APIs do Groq e do Hugging Face (`.env` do diretório `backend-python`)
+Para rodar o projeto, primeiro é necessário criar: <br>
+    1) Token JWT para segurança do endpoint de Update (`.env` do diretório `backend-java`) <br>
+    2) Chaves das APIs do Groq e do Hugging Face (`.env` do diretório `backend-python`) <br>
 
 Após isso, executar o comando `docker compose up --build` na raiz do projeto.
 
